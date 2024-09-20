@@ -5,9 +5,12 @@ import java.util.Arrays;
 
 public class RollTwoDice {
     private static int rollCount = 0;
-    private static int totalSum = 0;
-    private static int totalSameEyes = 0;
-    private static int [] sameEyes = new int[6];
+
+    // Task 2
+    private static int sum_of_dice = 0;
+
+    // Task 5
+    private static int[] occurrence_array = new int[6]; // Global array declaration with 6 elements
 
     public static void main(String[] args) {
         System.out.println("Velkommen til spillet, rul en terning.");
@@ -31,71 +34,115 @@ public class RollTwoDice {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Rul en terning? ('ja/nej') ");
         String answer = scanner.nextLine();
-        while (!answer.equals("nej")) {
-            int [] faces = rollDice();
-            System.out.println("Du har slået: " + Arrays.toString(faces));
-            int sum = sum(faces);
-            System.out.println("Du slog i alt: " + sum);
 
-            System.out.println("Største slag var: " + Math.max(faces[0],faces[1] ));
+        while (!answer.equals("nej")) {
+            int[] faces = rollDice(); // Faces invoke rollDice method
+            System.out.println("Du rullede: " + Arrays.toString(faces)); // Array class to string (presents in console)
 
             updateStatistics(faces);
 
-            System.out.print("Rul en terning? ('ja/nej') ");
+            System.out.print("Rul en terning? ('Indtast 'nej' for afslut spil') ");
             answer = scanner.nextLine();
         }
 
         printStatistics();
-        System.out.println();
         scanner.close();
     }
 
+    // Task 1
     private static int[] rollDice() {
+        // Constant variables because we don't manipulate the structure of the array
+        final int [] dice_arr = new int[2]; // Creates array with two index'
+        final int dice_arr_length = dice_arr.length; // array length calculated in variable
 
-        int [] diceArr = new int[2];
-        int arrayLength = diceArr.length;
-        for (int i = 0; i < arrayLength; i++){
-            int diceValue = (int)(Math.random()*6+1);
-            diceArr[i]=diceValue;
+        // Loop for iterating over value of dice
+        for(int index = 0; index < dice_arr_length; index++){
+            int dice_value = (int) (Math.random() * 6 + 1); // Random no. between 1 and 6
+            dice_arr[index] = dice_value; // Index of outer_index is set to value of dice_1
         }
 
-        return diceArr;
+        equal_eyes(dice_arr); // Method invoke after dice roll
+
+        return dice_arr;
     }
 
+    // Task 2
+    private static int sum_of_dice(int[] two_dice_array){
+        final int[] dice_array = two_dice_array;
+        final int dice_arr_length = two_dice_array.length; // array length calculated in variable
 
-    private static int sum (int [] diceFaces){
-        int [] result = diceFaces;
+        int total_sum = 0;
 
-        int sum = result[0] + result[1];
+        // Loop for iterating over value of dice
+        for(int index = 0; index < dice_arr_length; index++){
+            int dice_sum = dice_array[index];
+            total_sum += dice_sum;
+        }
 
-        return sum;
+        return total_sum;
     }
 
-    private static void updateStatistics(int [] faces) {
+    // Task 3
+    private static boolean equal_eyes (int[] two_dice_array){
+
+        final int dice_arr_length = two_dice_array.length; // array length calculated in variable
+
+        // Loop for iterating over value of dice
+        if(two_dice_array[0] == two_dice_array[1]){
+            return true;
+        }
+        return false;
+    }
+
+    // Task 4
+    private static int greatest_value(int[] two_dice_array){
+        return Math.max(two_dice_array[0], two_dice_array[1]); // Greatest of the two indexes is returned
+    }
+
+    // Task 5
+    private static int[] occurrence (int[] two_dice_array){
+        // For loop for iterating over element of array
+        for (int index = 1; index <= 6; index++){
+            if (two_dice_array[0] == index){ // if first index of array equals index
+                occurrence_array[index - 1]++; // Add 1 to occurrence_array
+            } else if (two_dice_array[1] == index){ // If second array equals index
+                occurrence_array[index - 1]++; // Add 1 to occurence_array
+            }
+        }
+        return occurrence_array; // Return value of occurrence_array to global array
+    }
+
+    private static void updateStatistics(int[] faces) {
+        // Task 3
+        if(equal_eyes(faces)){ // Returned value true...
+            System.out.println("Both dices have matching values!"); // Print output to user
+        }
+
+        // Task 4 - determines the greatest value of the rolls
+        System.out.println("Greatest value of roll: " + greatest_value(faces));
+
+        // Task 2
+        int sum = sum_of_dice(faces); // int variable for calculating sum of rolled dice
+        System.out.println("Du rullede i alt: " + sum); // Output to user
+        sum_of_dice += sum; // value of sum_of_dice equals to sum_of_dice + calculated sum
+
+        occurrence(faces); // method invoke with parameter of array parameter of updateStatistics
+
         rollCount++;
-        for (int i = 1; i <= 6; i++) {
-            if (faces[0] == i) {
-                sameEyes[i-1]++;
-            }
-            if (faces[1] == i) {
-                sameEyes[i-1]++;
-            }
-        }
-        if (faces[0]==faces[1]){
-            System.out.println("Du slog par.");
-            totalSameEyes++;
-        }
-        totalSum+=faces[0]+faces[1];
     }
 
     private static void printStatistics() {
-        System.out.println("Results:");
+        System.out.println("\nResults:");
         System.out.println("-------");
         System.out.println("Antal rul: " + rollCount);
-        System.out.println("Total øjne af slag: " + totalSum);
-        System.out.println("Antal gange terningerne havde samme øjne: " + totalSameEyes);
-        for (int i = 0; i<sameEyes.length; i++)
-            System.out.println("Antal " + (i+1) + "ere: " + sameEyes[i]);
+        System.out.println("-------");
+        // Task 2
+        System.out.println("Total sum for alle kast: " + sum_of_dice);
+        System.out.println("-------");
+        // Task 5
+        for(int index = 0; index < 6; index++){
+            System.out.println("Antal " + (index + 1) + "'ere: " + occurrence_array[index]);
+        }
+        System.out.println("-------");
     }
-
 }
